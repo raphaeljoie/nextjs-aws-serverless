@@ -1,8 +1,14 @@
-import * as Stream from 'stream';
-import * as http from 'http';
+// @ts-ignore
+// eslint-disable-next-line import/no-named-default
+import { default as Stream } from 'stream';
+// @ts-ignore
+// eslint-disable-next-line import/no-named-default
+import { default as http, IncomingMessage } from 'http';
+// @ts-ignore
+// eslint-disable-next-line import/no-named-default
+import { default as zlib } from 'zlib';
 import { Buffer } from 'buffer';
-import * as zlib from 'zlib';
-import { IncomingMessage } from 'http';
+
 import { CloudFrontResponse } from './CloudFrontResponse';
 import { CloudFrontEvent } from './CloudFrontEvent';
 import { CloudFrontHeaders } from './CloudFrontHeaders';

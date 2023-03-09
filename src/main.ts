@@ -30,12 +30,13 @@ export default async function main(options : Options = {}) {
   const handlerDistExt = thisOptions.handlerType === 'module' || packageJson.type === 'module' ? '.mjs' : '.cjs';
   copyFileSync(join(__dirname, '..', 'dist', `handler${handlerDistExt}`), join(outLambdaPath, thisOptions.handlerFilename));
 
-  const staticDir = join(dotNextPath, 'static');
-  const publicDir = join(thisOptions.source, 'public');
+  const sourceStaticDirPath = join(dotNextPath, 'static');
+  const sourcePublicDirPath = join(thisOptions.source, 'public');
 
   const outStaticPath = join(outPath, thisOptions.staticDir);
-  mkdirSync(join(outStaticPath, 'static'));
-  mkdirSync(join(outStaticPath, 'public'));
-  fse.default.copySync(staticDir, join(outStaticPath, 'static'));
-  fse.default.copySync(publicDir, join(outStaticPath, 'public'));
+  fse.default.copySync(sourceStaticDirPath, join(outStaticPath, '_next', 'static'));
+  fse.default.copySync(sourcePublicDirPath, outStaticPath);
+
+  const sourceTerraformPath = join(__dirname, '..', 'dist', 'terraform');
+  fse.default.copySync(sourceTerraformPath, join(outPath, 'terraform'));
 }

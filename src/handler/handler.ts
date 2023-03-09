@@ -1,15 +1,17 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import NextServer from 'next/dist/server/next-server';
+import NextServerBundle from 'next/dist/server/next-server';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { NodeNextRequest, NodeNextResponse } from 'next/dist/server/base-http/node';
 
-// eslint-disable-next-line import/no-import-module-exports
-import * as path from 'path';
+import { join } from 'path';
 
 import cloudFrontEventCompat from './cloudFrontEventCompat';
 import { CloudFrontResponse } from './CloudFrontResponse';
 import { CloudFrontHeaders } from './CloudFrontHeaders';
 import { CloudFrontEvent } from './CloudFrontEvent';
+
+// @ts-ignore
+const NextServer = NextServerBundle.default;
 
 // process.env.NODE_ENV = 'production';
 process.chdir(__dirname);
@@ -69,7 +71,7 @@ const requiredServerFiles = require('./.next/required-server-files.json');
 const nextServer = new NextServer({
   hostname,
   port: 3000,
-  dir: path.join(__dirname),
+  dir: join(__dirname),
   dev: false,
   customServer: false,
   // Compress fails
@@ -88,8 +90,10 @@ export const handler = async (event, context) => {
   );
 
   try {
+    // @ts-ignore
     await nextHandler(new NodeNextRequest(req), new NodeNextResponse(res));
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(err);
     res.statusCode = 500;
     res.end(`internal server error. ${new Date()}`);
