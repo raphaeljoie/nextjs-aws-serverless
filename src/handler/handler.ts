@@ -100,6 +100,7 @@ export const handler = async (event, context) => {
     .find((route) => cloudFrontEvent.request.uri.match(route.regex));
 
   if (staticRoute) {
+    if (cloudFrontEvent.request.uri === '/') cloudFrontEvent.request.uri = '/index';
     cloudFrontEvent.request.uri = `${cloudFrontEvent.request.uri}.html`;
     return cloudFrontEvent.request;
   }

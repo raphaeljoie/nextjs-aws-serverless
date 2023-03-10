@@ -12,7 +12,7 @@ module "lambda" {
 
 module "webapp" {
   source  = "raphaeljoie/cloudfront-webapp/aws"
-  version = "0.1.2"
+  version = "0.1.3"
 
   lambda_qualified_arn = module.lambda.lambda_qualified_arn
 
