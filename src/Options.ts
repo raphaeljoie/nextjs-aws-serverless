@@ -4,7 +4,7 @@ export type Options = {
   standaloneDir?: string,
   outDir?: string,
   lambdaDir?: string,
-  staticDir?: string,
+  s3Dir?: string,
   terraformDir?: string,
   handlerType?: string | null
   handlerFilename?: string
@@ -13,9 +13,9 @@ export type Options = {
 export const DEFAULT_OPTIONS: Options = {
   dotNextDir: '.next',
   standaloneDir: 'standalone',
-  outDir: '.next-standalone',
+  outDir: '.next-serverless',
   lambdaDir: 'lambda',
-  staticDir: 'static',
+  s3Dir: 's3',
   terraformDir: 'terraform',
   // Take from package.json
   handlerType: null,

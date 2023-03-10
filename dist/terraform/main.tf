@@ -41,12 +41,12 @@ module "webapp" {
 }
 
 resource "aws_s3_object" "dist" {
-  for_each = fileset("${path.module}/../static/static", "**/*")
+  for_each = fileset("${path.module}/../s3", "**/*")
 
   bucket = module.webapp.static_bucket
   force_destroy = true
-  key    = "_next/static/${each.value}"
-  source = "${path.module}/../static/static/${each.value}"
+  key    = each.value
+  source = "${path.module}/../s3/${each.value}"
   # etag makes the file update when it changes; see https://stackoverflow.com/questions/56107258/terraform-upload-file-to-s3-on-every-apply
-  etag   = filemd5("${path.module}/../static/static/${each.value}")
+  etag   = filemd5("${path.module}/../s3/${each.value}")
 }
