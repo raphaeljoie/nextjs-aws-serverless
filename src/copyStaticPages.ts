@@ -1,5 +1,5 @@
-import { extname, join } from 'path';
-import { copyFileSync } from 'fs';
+import { extname, join, dirname } from 'path';
+import { copyFileSync, mkdirSync } from 'fs';
 import browseDirSync from './browseDirSync';
 
 export default function copyStaticPages(standalonePath, s3Path) {
@@ -7,6 +7,14 @@ export default function copyStaticPages(standalonePath, s3Path) {
   browseDirSync(pagesPath)
     .filter((path) => ['.htm', '.html'].includes(extname(path)))
     .forEach((path) => {
-      copyFileSync(path, join(s3Path, path.replace(pagesPath, '')));
+      const destPath = join(s3Path, path.replace(pagesPath, ''));
+      const destDirPath = dirname(destPath);
+
+      try {
+        mkdirSync(destDirPath, { recursive: true });
+      } catch (e) {
+        if (e.errorCode !== 'EEXIST') throw e;
+      }
+      copyFileSync(path, destPath);
     });
 }
