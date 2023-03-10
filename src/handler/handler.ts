@@ -10,6 +10,7 @@ import { CloudFrontResponse } from './CloudFrontResponse';
 import { CloudFrontHeaders } from './CloudFrontHeaders';
 import { CloudFrontEvent } from './CloudFrontEvent';
 import { RouteManifest } from './RouteManifest';
+import { PublicFilesManifest } from './PublicFilesManifest';
 
 // @ts-ignore
 const NextServer = NextServerBundle.default;
@@ -70,6 +71,8 @@ function removeBlacklistedHeaders(headers: CloudFrontHeaders) {
 const requiredServerFiles = require('./.next/required-server-files.json');
 // eslint-disable-next-line import/no-unresolved,global-require
 const routeManifest = require('./.next/routes-manifest.json') as RouteManifest;
+// eslint-disable-next-line import/no-unresolved,global-require
+const publicFilesManifest = require('./public-files-manifest.json') as PublicFilesManifest;
 
 const nextServer = new NextServer({
   hostname,
@@ -96,10 +99,18 @@ export const handler = async (event, context) => {
   const staticRoute = routeManifest.staticRoutes
     .find((route) => cloudFrontEvent.request.uri.match(route.regex));
 
-  if (staticRoute) return null;
+  if (staticRoute) {
+    cloudFrontEvent.request.uri = `${cloudFrontEvent.request.uri}.html`;
+    return cloudFrontEvent.request;
+  }
 
   // SKIP PUBLIC ASSETS //
-  // TODO
+  const publicFile = publicFilesManifest.files
+    .find((route) => cloudFrontEvent.request.uri === route);
+
+  if (publicFile) return cloudFrontEvent.request;
+
+  // OTHERWISE, USE SERVER SIDE rendering
 
   const { req, res, responsePromise } = cloudFrontEventCompat(
     cloudFrontEvent,

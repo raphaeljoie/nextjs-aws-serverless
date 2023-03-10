@@ -1,4 +1,4 @@
-import { mkdirSync, copyFileSync } from 'fs';
+import { mkdirSync, copyFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import * as fse from 'fs-extra';
 
@@ -11,6 +11,7 @@ import {
   checkStandaloneBuild,
   DEFAULT_OPTIONS, clearOutDir,
 } from './index';
+import browseDirSync from './browseDirSync';
 
 export default async function main(options : Options = {}) {
   const thisOptions = { ...DEFAULT_OPTIONS, options };
@@ -32,15 +33,29 @@ export default async function main(options : Options = {}) {
   const handlerDistExt = thisOptions.handlerType === 'module' || packageJson.type === 'module' ? '.mjs' : '.cjs';
   copyFileSync(join(distPath, `handler${handlerDistExt}`), join(outLambdaPath, thisOptions.handlerFilename));
 
-  const sourceStaticDirPath = join(dotNextPath, 'static');
-  const sourcePublicDirPath = join(thisOptions.source, 'public');
-
+  /// S3
   const outS3Path = join(outPath, thisOptions.s3Dir);
+
+  // S3 Static files, referred as /_next/static/*
+  const sourceStaticDirPath = join(dotNextPath, 'static');
   fse.default.copySync(sourceStaticDirPath, join(outS3Path, '_next', 'static'));
+
+  // S3 Static pages
+  copyStaticPages(standalonePath, outS3Path);
+
+  // S3 Public files
+  const sourcePublicDirPath = join(thisOptions.source, 'public');
   fse.default.copySync(sourcePublicDirPath, outS3Path);
 
+  const publicFilesMetaPath = join(outLambdaPath, thisOptions.publicFilesManifest);
+  const publicFiles = browseDirSync(sourcePublicDirPath)
+    .map((filePath) => filePath.replace(sourcePublicDirPath, ''));
+  writeFileSync(publicFilesMetaPath, JSON.stringify({
+    version: 1,
+    files: publicFiles,
+  }), 'utf8');
+
+  /// Terraform
   const sourceTerraformPath = join(distPath, 'terraform');
   fse.default.copySync(sourceTerraformPath, join(outPath, 'terraform'));
-
-  copyStaticPages(standalonePath, outS3Path);
 }

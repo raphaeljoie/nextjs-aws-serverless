@@ -8,6 +8,7 @@ export type Options = {
   terraformDir?: string,
   handlerType?: string | null
   handlerFilename?: string
+  publicFilesManifest?: string
 };
 
 export const DEFAULT_OPTIONS: Options = {
@@ -20,4 +21,5 @@ export const DEFAULT_OPTIONS: Options = {
   // Take from package.json
   handlerType: null,
   handlerFilename: 'handler.js',
+  publicFilesManifest: 'public-files-manifest.json',
 };

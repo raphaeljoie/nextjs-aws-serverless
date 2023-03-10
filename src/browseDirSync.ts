@@ -1,7 +1,7 @@
 import { readdirSync, Dirent } from 'fs';
 import { join } from 'path';
 
-export default function browseDirSync(dirPath: string, arrayOfFiles: string[] = []) {
+export default function browseDirSync(dirPath: string, arrayOfFiles: string[] = []) : string[] {
   const files: Dirent[] = readdirSync(dirPath, { withFileTypes: true });
 
   files.forEach((file) => {
