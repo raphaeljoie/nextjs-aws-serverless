@@ -1,9 +1,12 @@
 module "lambda" {
   source  = "raphaeljoie/zip-lambda/aws"
-  version = "0.1.1"
+  version = "0.1.2"
 
   lambda_name = coalesce(var.lambda_name, "nextjs-${var.app_name}")
   source_path = "${path.module}/../lambda"
+
+  edge_permissions = true
+
   timeout = 10
 }
 
