@@ -9,6 +9,7 @@ import cloudFrontEventCompat from './cloudFrontEventCompat';
 import { CloudFrontResponse } from './CloudFrontResponse';
 import { CloudFrontHeaders } from './CloudFrontHeaders';
 import { CloudFrontEvent } from './CloudFrontEvent';
+import { RouteManifest } from './RouteManifest';
 
 // @ts-ignore
 const NextServer = NextServerBundle.default;
@@ -67,6 +68,8 @@ function removeBlacklistedHeaders(headers: CloudFrontHeaders) {
 
 // eslint-disable-next-line import/no-unresolved
 const requiredServerFiles = require('./.next/required-server-files.json');
+// eslint-disable-next-line import/no-unresolved,global-require
+const routeManifest = require('./.next/routes-manifest.json') as RouteManifest;
 
 const nextServer = new NextServer({
   hostname,
@@ -82,7 +85,21 @@ const nextHandler = nextServer.getRequestHandler();
 // Azure lambda requires non-default export
 // eslint-disable-next-line @typescript-eslint/no-unused-vars,import/prefer-default-export
 export const handler = async (event, context) => {
+  // eslint-disable-next-line no-console
+  console.log(JSON.stringify(event));
   const cloudFrontEvent = event.Records[0].cf as CloudFrontEvent;
+
+  // HANDLE REDIRECTIONS //
+  // TODO
+
+  // SKIP STATIC ROUTES //
+  const staticRoute = routeManifest.staticRoutes
+    .find((route) => cloudFrontEvent.request.uri.match(route.regex));
+
+  if (staticRoute) return null;
+
+  // SKIP PUBLIC ASSETS //
+  // TODO
 
   const { req, res, responsePromise } = cloudFrontEventCompat(
     cloudFrontEvent,
